@@ -1,0 +1,18 @@
+<!-- questions/templates/questions/pool_list.html -->
+{% extends 'questions/base.html' %}
+{% block content %}
+<h2>Question Pools</h2>
+{% if pools %}
+    <ul>
+    {% for pool in pools %}
+        <li>
+            <a href="{% url 'pool_detail' pool.id %}">{{ pool.name }}</a> - 
+            <a href="{% url 'question_create_for_pool' pool.id %}">Add Question</a>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No pools available.</p>
+{% endif %}
+<a href="{% url 'pool_create' %}">Create New Pool</a>
+{% endblock %}

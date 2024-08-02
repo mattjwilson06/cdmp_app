@@ -1,0 +1,15 @@
+<!-- questions/templates/questions/question_form.html -->
+{% extends 'questions/base.html' %}
+{% block content %}
+    <h2>Create Question</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <h3>Answers</h3>
+        {{ formset.management_form }}
+        {% for answer_form in formset %}
+            {{ answer_form.as_p }}
+        {% endfor %}
+        <button type="submit">Create Question</button>
+    </form>
+{% endblock %} 

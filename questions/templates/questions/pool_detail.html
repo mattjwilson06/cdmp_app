@@ -1,0 +1,26 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<h2>Question Pool: {{ pool.name }}</h2>
+<p>Created by: {{ pool.created_by }}</p>
+<p>Created at: {{ pool.created_at }}</p>
+
+<h3>Questions in this pool:</h3>
+{% if pool.question_set.all %}
+    <ul>
+    {% for question in pool.question_set.all %}
+        <li>
+            {{ question.name }}
+            {% if question.current_version %}
+                - {{ question.current_version.text|truncatewords:10 }}
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No questions in this pool yet.</p>
+{% endif %}
+
+<a href="{% url 'question_create_for_pool' pool.id %}">Add New Question to This Pool</a>
+<br>
+<a href="{% url 'pool_list' %}">Back to Pool List</a>
+{% endblock %}

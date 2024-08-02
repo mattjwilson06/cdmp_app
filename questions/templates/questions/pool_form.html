@@ -1,0 +1,10 @@
+<!-- questions/templates/questions/pool_form.html -->
+{% extends 'questions/base.html' %}
+{% block content %}
+    <h2>Create Question Pool</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Pool</button>
+    </form>
+{% endblock %}
