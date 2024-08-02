@@ -1,15 +1,25 @@
 <!-- questions/templates/questions/question_form.html -->
 {% extends 'questions/base.html' %}
 {% block content %}
-    <h2>Create Question</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <h3>Answers</h3>
-        {{ formset.management_form }}
-        {% for answer_form in formset %}
-            {{ answer_form.as_p }}
-        {% endfor %}
-        <button type="submit">Create Question</button>
-    </form>
-{% endblock %} 
+<h2>Create Question</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <h3>Select Pools</h3>
+    {% if pool_id %}
+        <p>This question will be added to the pool you came from.</p>
+        <input type="hidden" name="pools" value="{{ pool_id }}">
+    {% else %}
+        {{ pool_form.as_p }}
+    {% endif %}
+
+    <h3>Answers</h3>
+    {{ formset.management_form }}
+    {% for answer_form in formset %}
+        {{ answer_form.as_p }}
+    {% endfor %}
+
+    <button type="submit">Create Question</button>
+</form>
+{% endblock %}

@@ -35,8 +35,9 @@ class QuestionPoolDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['questions'] = Question.objects.filter(pools=self.object)
+        context['questions'] = self.object.question_set.all()
         return context
+
 
 class QuestionPoolSelectionForm(forms.Form):
     pools = forms.ModelMultipleChoiceField(
@@ -62,7 +63,8 @@ class QuestionCreateView(LoginRequiredMixin, View):
         return render(request, 'questions/question_form.html', {
             'form': form,
             'pool_form': pool_form,
-            'formset': formset
+            'formset': formset,
+            'pool_id': pool_id
         })
 
     def post(self, request, pool_id=None):
@@ -85,16 +87,23 @@ class QuestionCreateView(LoginRequiredMixin, View):
                 question.current_version = question_version
                 question.save()
 
-                formset.instance = question_version
-                formset.save()
+                # Save formset
+                for answer_form in formset:
+                    if answer_form.is_valid() and answer_form.has_changed():
+                        answer = answer_form.save(commit=False)
+                        answer.question = question
+                        answer.question_version = question_version
+                        answer.save()
 
+                selected_pools = pool_form.cleaned_data['pools']
+                
                 # If pool_id is provided, ensure this pool is included
                 if pool_id:
-                    pool = get_object_or_404(QuestionPool, id=pool_id)
-                    if pool not in pool_form.cleaned_data['pools']:
-                        pool_form.cleaned_data['pools'].append(pool)
+                    specific_pool = get_object_or_404(QuestionPool, id=pool_id)
+                    if specific_pool not in selected_pools:
+                        selected_pools.append(specific_pool)
 
-                for pool in pool_form.cleaned_data['pools']:
+                for pool in selected_pools:
                     QuestionPoolAssociation.objects.create(
                         question=question,
                         pool=pool,
@@ -102,11 +111,12 @@ class QuestionCreateView(LoginRequiredMixin, View):
                     )
 
             # Redirect to the detail view of the pool where the question was added
-            redirect_pool = pool if pool_id else pool_form.cleaned_data['pools'][0]
+            redirect_pool = specific_pool if pool_id else selected_pools[0]
             return redirect('pool_detail', pk=redirect_pool.id)
         
         return render(request, 'questions/question_form.html', {
             'form': form,
             'pool_form': pool_form,
-            'formset': formset
+            'formset': formset,
+            'pool_id': pool_id
         })

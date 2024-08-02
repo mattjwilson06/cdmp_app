@@ -39,5 +39,6 @@ AnswerFormSet = inlineformset_factory(
     Answer, 
     form=AnswerForm, 
     extra=4, 
-    can_delete=True
+    can_delete=True,
+    fields=['text', 'is_correct']
 )
