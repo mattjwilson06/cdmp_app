@@ -1,0 +1,16 @@
+{% extends 'questions/base.html' %}
+{% block content %}
+<h2>Question: {{ question.name }}</h2>
+<p><strong>Text:</strong> {{ question.current_version.text }}</p>
+<p><strong>Version:</strong> {{ question.current_version.version_number }}</p>
+<h3>Answers:</h3>
+<ul>
+{% for answer in answers %}
+    <li>{{ answer.text }} {% if answer.is_correct %}(Correct){% endif %}</li>
+{% empty %}
+    <li>No answers available.</li>
+{% endfor %}
+</ul>
+<a href="{% url 'question_edit' question.id %}">Edit Question</a>
+<p><a href="{% url 'pool_detail' question.pools.first.id %}">Back to Pool</a></p>
+{% endblock %}
